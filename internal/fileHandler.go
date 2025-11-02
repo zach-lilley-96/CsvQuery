@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-func GetHeaders(path string) []string {
+func GetCsvData(path string) [][]string {
 	file, err := os.Open(path)
 	if err != nil {
 		panic(err)
@@ -13,10 +13,11 @@ func GetHeaders(path string) []string {
 	defer file.Close()
 
 	reader := csv.NewReader(file)
-	data, err := reader.Read()
+	data, err := reader.ReadAll()
 	if err != nil {
 		panic(err)
 	}
 
 	return data
+
 }

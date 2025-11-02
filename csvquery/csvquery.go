@@ -10,6 +10,7 @@ import (
 type CsvQuery struct {
 	Path            string
 	headers         []string
+	data            [][]string
 	numberOfRecords uint
 	selectedColum   string
 	getAll          bool
@@ -18,10 +19,11 @@ type CsvQuery struct {
 }
 
 func NewCsvQuery(path string) *CsvQuery {
-	headers := handler.GetHeaders(path)
+	csvRows := handler.GetCsvData(path)
 	return &CsvQuery{
 		Path:         path,
-		headers:      headers,
+		headers:      csvRows[0],
+		data:         csvRows[1:],
 		getAll:       false,
 		strCompareTo: nil,
 		numCompareTo: nil,
