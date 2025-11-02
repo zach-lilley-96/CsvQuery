@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"slices"
 
-	handler "github.com/lilleyz7/csvquery/internal"
+	handler "github.com/zach-lilley-96/csvquery/internal"
 )
 
 type CsvQuery struct {
