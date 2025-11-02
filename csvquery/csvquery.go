@@ -4,13 +4,12 @@ import (
 	"fmt"
 	"slices"
 
-	handler "github.com/zach-lilley-96/csvquery/internal"
+	handler "github.com/zach-lilley-96/csvquery/internal/handlers"
 )
 
 type CsvQuery struct {
 	Path            string
 	headers         []string
-	data            [][]string
 	numberOfRecords uint
 	selectedColum   string
 	getAll          bool
@@ -19,11 +18,10 @@ type CsvQuery struct {
 }
 
 func NewCsvQuery(path string) *CsvQuery {
-	csvRows := handler.GetCsvData(path)
+	headers := handler.GetHeaders(path)
 	return &CsvQuery{
 		Path:         path,
-		headers:      csvRows[0],
-		data:         csvRows[1:],
+		headers:      headers,
 		getAll:       false,
 		strCompareTo: nil,
 		numCompareTo: nil,

@@ -1,0 +1,6 @@
+teststr,testint,testfloat
+hello,42,3.14
+world,7,2.71
+foo,100,1.61
+bar,0,0.0
+baz,-1,-3.14
