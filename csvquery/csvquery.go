@@ -74,15 +74,3 @@ func (cq *CsvQuery) StrEq(value string) {
 func (cq *CsvQuery) Ct(value string) {
 	cq.strCompareTo = &value
 }
-
-func (cq *CsvQuery) GetAll() {
-
-}
-
-func (cq *CsvQuery) Get(quantity int) {
-
-}
-
-func (cq *CsvQuery) First() {
-
-}
