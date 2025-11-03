@@ -10,18 +10,20 @@ import (
 type CsvQuery struct {
 	Path            string
 	headers         []string
+	length          uint
 	numberOfRecords uint
-	selectedColum   string
+	selectedColum   int
 	getAll          bool
 	strCompareTo    *string
 	numCompareTo    *float64
 }
 
 func NewCsvQuery(path string) *CsvQuery {
-	headers := handler.GetHeaders(path)
+	headers, len := handler.GetHeaders(path)
 	return &CsvQuery{
 		Path:         path,
 		headers:      headers,
+		length:       len,
 		getAll:       false,
 		strCompareTo: nil,
 		numCompareTo: nil,
@@ -35,6 +37,7 @@ func (cq *CsvQuery) Select(quantity uint) *CsvQuery {
 
 func (cq *CsvQuery) SelectAll() *CsvQuery {
 	cq.getAll = true
+	cq.numberOfRecords = cq.length
 	return cq
 }
 
@@ -43,7 +46,7 @@ func (cq *CsvQuery) Where(column string) *CsvQuery {
 		error := fmt.Sprintf("Column %s does not exist", column)
 		panic(error)
 	}
-	cq.selectedColum = column
+	cq.selectedColum = slices.Index(cq.headers, column)
 	return cq
 }
 
