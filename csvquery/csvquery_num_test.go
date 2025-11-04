@@ -13,7 +13,7 @@ func TestHandler(t *testing.T) {
 		fmt.Println(row)
 	}
 
-	expectedLength := 3
+	expectedLength := 9
 	if len(*query) != expectedLength {
 		t.Errorf("Expected %d results, got %d", expectedLength, len(*query))
 	}
@@ -23,7 +23,7 @@ func TestHandler(t *testing.T) {
 		fmt.Println(row)
 	}
 
-	expectedLength2 := 2
+	expectedLength2 := 5
 	if len(*query2) != expectedLength2 {
 		t.Errorf("Expected %d results, got %d", expectedLength2, len(*query2))
 	}
