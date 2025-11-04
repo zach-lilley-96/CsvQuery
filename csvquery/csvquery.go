@@ -3,6 +3,7 @@ package csvquery
 import (
 	"fmt"
 	"slices"
+	"strconv"
 
 	handler "github.com/zach-lilley-96/csvquery/internal/handlers"
 )
@@ -12,7 +13,7 @@ type CsvQuery struct {
 	headers         []string
 	length          uint
 	numberOfRecords uint
-	selectedColum   int
+	selectedColumn  int
 	getAll          bool
 	strCompareTo    *string
 	numCompareTo    *float64
@@ -46,28 +47,51 @@ func (cq *CsvQuery) Where(column string) *CsvQuery {
 		error := fmt.Sprintf("Column %s does not exist", column)
 		panic(error)
 	}
-	cq.selectedColum = slices.Index(cq.headers, column)
+	cq.selectedColumn = slices.Index(cq.headers, column)
 	return cq
 }
 
-func (cq *CsvQuery) Gt(value float64) {
-	cq.numCompareTo = &value
+func (cq *CsvQuery) Execute(fn func(float64, float64) bool) *[][]string {
+	var results [][]string
+	fileData := handler.GetAll(cq.Path)
+	for i, row := range *fileData {
+		if i != 0 {
+			valueAsFloat, err := strconv.ParseFloat(row[cq.selectedColumn], 64)
+			if err != nil {
+				continue
+			}
+
+			if fn(valueAsFloat, *cq.numCompareTo) {
+				results = append(results, row)
+			}
+		}
+	}
+	return &results
 }
 
-func (cq *CsvQuery) Gte(value float64) {
+func (cq *CsvQuery) Gt(value float64) *[][]string {
 	cq.numCompareTo = &value
+	return cq.Execute(handler.GreaterThan)
 }
 
-func (cq *CsvQuery) Lt(value float64) {
+func (cq *CsvQuery) Gte(value float64) *[][]string {
 	cq.numCompareTo = &value
+	return cq.Execute(handler.GreaterThanOrEqual)
 }
 
-func (cq *CsvQuery) Lte(value float64) {
+func (cq *CsvQuery) Lt(value float64) *[][]string {
 	cq.numCompareTo = &value
+	return cq.Execute(handler.LessThan)
 }
 
-func (cq *CsvQuery) Eq(value float64) {
+func (cq *CsvQuery) Lte(value float64) *[][]string {
 	cq.numCompareTo = &value
+	return cq.Execute(handler.LessThanOrEqual)
+}
+
+func (cq *CsvQuery) Eq(value float64) *[][]string {
+	cq.numCompareTo = &value
+	return cq.Execute(handler.EqualTo)
 }
 
 func (cq *CsvQuery) StrEq(value string) {
