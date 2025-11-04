@@ -51,10 +51,14 @@ func (cq *CsvQuery) Where(column string) *CsvQuery {
 	return cq
 }
 
-func (cq *CsvQuery) Execute(fn func(float64, float64) bool) *[][]string {
+func (cq *CsvQuery) numberQuery(fn func(float64, float64) bool) *[][]string {
 	var results [][]string
 	fileData := handler.GetAll(cq.Path)
+	count := 0
 	for i, row := range *fileData {
+		if count >= int(cq.numberOfRecords) && !cq.getAll {
+			break
+		}
 		if i != 0 {
 			valueAsFloat, err := strconv.ParseFloat(row[cq.selectedColumn], 64)
 			if err != nil {
@@ -62,6 +66,24 @@ func (cq *CsvQuery) Execute(fn func(float64, float64) bool) *[][]string {
 			}
 
 			if fn(valueAsFloat, *cq.numCompareTo) {
+				results = append(results, row)
+				count++
+			}
+		}
+	}
+	return &results
+}
+
+func (cq *CsvQuery) strQuery(fn func(string, string) bool) *[][]string {
+	if cq.strCompareTo == nil {
+		panic("String to compare to is nil")
+	}
+	var results [][]string
+	fileData := handler.GetAll(cq.Path)
+	for i, row := range *fileData {
+		if i != 0 {
+
+			if fn(row[cq.selectedColumn], *cq.strCompareTo) {
 				results = append(results, row)
 			}
 		}
@@ -71,33 +93,45 @@ func (cq *CsvQuery) Execute(fn func(float64, float64) bool) *[][]string {
 
 func (cq *CsvQuery) Gt(value float64) *[][]string {
 	cq.numCompareTo = &value
-	return cq.Execute(handler.GreaterThan)
+	return cq.numberQuery(handler.GreaterThan)
 }
 
 func (cq *CsvQuery) Gte(value float64) *[][]string {
 	cq.numCompareTo = &value
-	return cq.Execute(handler.GreaterThanOrEqual)
+	return cq.numberQuery(handler.GreaterThanOrEqual)
 }
 
 func (cq *CsvQuery) Lt(value float64) *[][]string {
 	cq.numCompareTo = &value
-	return cq.Execute(handler.LessThan)
+	return cq.numberQuery(handler.LessThan)
 }
 
 func (cq *CsvQuery) Lte(value float64) *[][]string {
 	cq.numCompareTo = &value
-	return cq.Execute(handler.LessThanOrEqual)
+	return cq.numberQuery(handler.LessThanOrEqual)
 }
 
 func (cq *CsvQuery) Eq(value float64) *[][]string {
 	cq.numCompareTo = &value
-	return cq.Execute(handler.EqualTo)
+	return cq.numberQuery(handler.EqualTo)
 }
 
-func (cq *CsvQuery) StrEq(value string) {
+func (cq *CsvQuery) StrEq(value string) *[][]string {
 	cq.strCompareTo = &value
+	return cq.strQuery(handler.StrEqualTo)
 }
 
-func (cq *CsvQuery) Ct(value string) {
+func (cq *CsvQuery) StrNeq(value string) *[][]string {
 	cq.strCompareTo = &value
+	return cq.strQuery(handler.StrNotEqualTo)
+}
+
+func (cq *CsvQuery) StrContains(value string) *[][]string {
+	cq.strCompareTo = &value
+	return cq.strQuery(handler.StrContains)
+}
+
+func (cq *CsvQuery) StrNotContains(value string) *[][]string {
+	cq.strCompareTo = &value
+	return cq.strQuery(handler.StrNotContains)
 }

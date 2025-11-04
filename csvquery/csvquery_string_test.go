@@ -1,18 +1,16 @@
 package csvquery
 
-import (
-	"testing"
-)
+import "testing"
 
-func TestHandler(t *testing.T) {
+func TestString(t *testing.T) {
 	path := "../testFiles/test.csv"
 
-	query := NewCsvQuery(path).SelectAll().Where("testint").Gte(2.17)
+	query := NewCsvQuery(path).SelectAll().Where("teststr").StrEq("hello")
 	for _, row := range *query {
 		t.Log(row)
 	}
 
-	expectedLength := 3
+	expectedLength := 1
 	if len(*query) != expectedLength {
 		t.Errorf("Expected %d results, got %d", expectedLength, len(*query))
 	}
